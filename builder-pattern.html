@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builder Pattern — Davi Moreira de Santana</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --accent: #f59e0b;
+  --accent2: #fb923c;
+  --accent3: #ef4444;
+  --text: #e4e4e7;
+  --text-dim: #71717a;
+  --green: #22c55e;
+  --blue: #3b82f6;
+  --purple: #a855f7;
+  --cyan: #06b6d4;
+  --surface: #18181b;
+  --border: #27272a;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+#three-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 200px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s 0.5s forwards;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.8s forwards;
+}
+
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero .subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: var(--text-dim);
+  max-width: 600px;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 1s 1.1s forwards;
+}
+
+.hero .author {
+  margin-top: 3rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  opacity: 0;
+  animation: fadeUp 0.8s 1.4s forwards;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s 1.8s forwards;
+  z-index: 2;
+}
+
+.scroll-indicator span {
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-family: 'Space Mono', monospace;
+}
+
+.scroll-arrow {
+  width: 20px;
+  height: 30px;
+  border: 2px solid var(--text-dim);
+  border-radius: 10px;
+  position: relative;
+}
+.scroll-arrow::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: scrollDot 1.5s infinite;
+}
+
+@keyframes scrollDot {
+  0%, 100% { top: 6px; opacity: 1; }
+  50% { top: 16px; opacity: 0.3; }
+}
+
+/* ===== SECTIONS ===== */
+section {
+  padding: 6rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--accent);
+}
+
+section h2 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 2rem;
+}
+
+section p {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  max-width: 750px;
+  margin-bottom: 1.5rem;
+}
+
+/* Reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Delay classes */
+.d1 { transition-delay: 0.1s !important; }
+.d2 { transition-delay: 0.2s !important; }
+.d3 { transition-delay: 0.3s !important; }
+.d4 { transition-delay: 0.4s !important; }
+.d5 { transition-delay: 0.5s !important; }
+
+/* ===== CARDS ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.card p {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 2rem auto;
+  max-width: 1100px;
+}
+
+/* ===== ANALOGY SECTION ===== */
+.analogy-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+@media (max-width: 768px) {
+  .analogy-container { grid-template-columns: 1fr; }
+}
+
+.analogy-visual {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.house-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: center;
+}
+
+.house-part {
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(20px);
+}
+.house-part.built {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.roof {
+  width: 0;
+  height: 0;
+  border-left: 80px solid transparent;
+  border-right: 80px solid transparent;
+  border-bottom: 60px solid var(--accent);
+  filter: drop-shadow(0 -4px 12px rgba(245, 158, 11, 0.3));
+}
+
+.walls {
+  width: 140px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+
+.window {
+  width: 24px;
+  height: 24px;
+  background: var(--cyan);
+  border-radius: 4px;
+  opacity: 0.8;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+}
+
+.door {
+  width: 28px;
+  height: 40px;
+  background: var(--accent2);
+  border-radius: 6px 6px 0 0;
+  position: absolute;
+  bottom: 0;
+}
+
+.foundation {
+  width: 170px;
+  height: 16px;
+  background: var(--text-dim);
+  border-radius: 4px;
+}
+
+.house-label {
+  margin-top: 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ===== CODE BLOCKS ===== */
+.code-block {
+  background: #0d0d12;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 2rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.code-header {
+  background: var(--surface);
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.code-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.code-dot.r { background: #ef4444; }
+.code-dot.y { background: #f59e0b; }
+.code-dot.g { background: #22c55e; }
+
+.code-title {
+  margin-left: 12px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.code-body {
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.code-body .kw { color: var(--purple); }
+.code-body .fn { color: var(--blue); }
+.code-body .str { color: var(--green); }
+.code-body .cm { color: var(--text-dim); font-style: italic; }
+.code-body .tp { color: var(--cyan); }
+.code-body .ac { color: var(--accent); }
+.code-body .num { color: var(--accent2); }
+
+/* ===== DIAGRAM ===== */
+.diagram-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem;
+  margin: 3rem 0;
+  overflow-x: auto;
+}
+
+.uml-diagram {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.uml-box {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  min-width: 200px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.uml-box:hover { border-color: var(--accent); }
+
+.uml-box-header {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.uml-box-body {
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.uml-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--text-dim);
+  font-size: 2rem;
+  align-self: center;
+}
+
+/* ===== PROS/CONS ===== */
+.pros-cons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+@media (max-width: 768px) {
+  .pros-cons { grid-template-columns: 1fr; }
+}
+
+.pros, .cons {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.pros { border-top: 3px solid var(--green); }
+.cons { border-top: 3px solid var(--accent3); }
+
+.pros h3, .cons h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.list-item .icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+
+/* ===== TIMELINE ===== */
+.timeline {
+  position: relative;
+  margin: 3rem 0;
+  padding-left: 40px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent), var(--purple), var(--cyan));
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 3rem;
+  padding-left: 2rem;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -28px;
+  top: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.timeline-step {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-item h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-item p {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+}
+
+/* ===== INTERACTIVE BUILDER ===== */
+.interactive-builder {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin: 3rem 0;
+}
+
+.builder-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.builder-btn {
+  padding: 0.6rem 1.2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.builder-btn:hover {
+  border-color: var(--accent);
+  background: rgba(245, 158, 11, 0.1);
+}
+.builder-btn.active {
+  border-color: var(--accent);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent);
+}
+
+.builder-output {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  min-height: 120px;
+  white-space: pre-wrap;
+}
+
+/* ===== PATTERN MAP ===== */
+.pattern-map {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+@media (max-width: 768px) {
+  .pattern-map { grid-template-columns: 1fr; }
+}
+
+.pattern-category {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.pattern-category h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pattern-tag {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin: 0.2rem;
+  color: var(--text-dim);
+  font-family: 'Space Mono', monospace;
+  transition: all 0.2s;
+}
+
+.pattern-tag.current {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(245, 158, 11, 0.1);
+  font-weight: 700;
+}
+
+/* ===== QUOTE ===== */
+.quote-block {
+  border-left: 3px solid var(--accent);
+  padding: 1.5rem 2rem;
+  margin: 2rem 0;
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 0 12px 12px 0;
+}
+
+.quote-block p {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--text);
+  font-weight: 300;
+}
+
+.quote-block cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: normal;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ===== APPLICABILITY SECTION ===== */
+.use-case {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.use-case::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+}
+.use-case:nth-child(1)::before { background: var(--accent); }
+.use-case:nth-child(2)::before { background: var(--blue); }
+.use-case:nth-child(3)::before { background: var(--green); }
+.use-case:nth-child(4)::before { background: var(--purple); }
+
+.use-case h4 {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+.use-case p {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 4rem 2rem;
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+footer p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-family: 'Space Mono', monospace;
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== GRAIN OVERLAY ===== */
+.grain {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===== COMPARISON TABLE ===== */
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+}
+.comparison th, .comparison td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.comparison th {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  background: var(--surface);
+}
+.comparison td { color: var(--text-dim); }
+.comparison tr:hover td { color: var(--text); background: rgba(255,255,255,0.02); }
+
+/* ===== NUMBER CALLOUTS ===== */
+.big-number {
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<canvas id="three-canvas"></canvas>
+<div class="grain"></div>
+
+<div class="content">
+
+  <!-- =================== HERO =================== -->
+  <section class="hero">
+    <div class="hero-badge">Padrão Criacional • GoF</div>
+    <h1><span class="highlight">Builder</span><br>Pattern</h1>
+    <p class="subtitle">Construa objetos complexos passo a passo, separando a construção da representação final.</p>
+    <p class="author">por Davi Moreira de Santana</p>
+    <div class="scroll-indicator">
+      <span>scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- =================== O QUE É UM PADRÃO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 01</div>
+      <h2>O que é um<br>Padrão de Projeto?</h2>
+    </div>
+
+    <p class="reveal d1">Padrões de projeto são soluções típicas para problemas recorrentes no design de software orientado a objetos. Funcionam como plantas arquitetônicas que podem ser adaptadas para resolver problemas específicos no seu código.</p>
+
+    <p class="reveal d2">Diferente de um algoritmo (que define passos claros para atingir uma meta), um padrão é uma descrição de alto nível de uma solução. Pense assim: um algoritmo é uma receita de comida, com etapas claras. Um padrão é uma planta de obra, onde você vê o resultado final e suas funcionalidades, mas a ordem exata de implementação depende de você.</p>
+
+    <div class="quote-block reveal d3">
+      <p>"O padrão não é um pedaço de código específico, mas um conceito geral para resolver um problema em particular."</p>
+      <cite>Refactoring.Guru</cite>
+    </div>
+
+    <div class="card-grid">
+      <div class="card reveal d1">
+        <div class="card-icon" style="background: rgba(245,158,11,0.15);">🎯</div>
+        <h3>Propósito</h3>
+        <p>Descreve brevemente o problema e a solução que o padrão endereça.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="card-icon" style="background: rgba(59,130,246,0.15);">🔧</div>
+        <h3>Motivação</h3>
+        <p>Explica a fundo o problema e como a solução proposta pelo padrão é viável.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="card-icon" style="background: rgba(168,85,247,0.15);">📐</div>
+        <h3>Estrutura</h3>
+        <p>Mostra as classes e objetos envolvidos e como eles se relacionam entre si.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== POR QUE APRENDER =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 02</div>
+      <h2>Por que aprender<br>Padrões de Projeto?</h2>
+    </div>
+
+    <p class="reveal d1">Padrões de projeto são um toolkit de soluções testadas e aprovadas para problemas comuns. Mesmo que você nunca encontre exatamente esses problemas, conhecê-los ensina a resolver todo tipo de desafio usando princípios de design orientado a objetos.</p>
+
+    <p class="reveal d2">Além disso, padrões definem uma linguagem comum que facilita a comunicação entre desenvolvedores. Ao dizer "use um Builder aqui", toda a equipe entende imediatamente a estrutura proposta, sem precisar de longas explicações.</p>
+
+    <div class="card-grid">
+      <div class="card reveal d1">
+        <div class="card-icon" style="background: rgba(34,197,94,0.15);">🧩</div>
+        <h3>Reutilização</h3>
+        <p>Soluções prontas que economizam tempo e reduzem bugs conhecidos no design do software.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="card-icon" style="background: rgba(6,182,212,0.15);">💬</div>
+        <h3>Comunicação</h3>
+        <p>Vocabulário compartilhado entre devs. "Builder", "Singleton", "Observer" carregam significado imediato.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="card-icon" style="background: rgba(239,68,68,0.15);">🏗️</div>
+        <h3>Arquitetura</h3>
+        <p>Ensinam princípios de design que melhoram toda a qualidade do código produzido.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== CLASSIFICAÇÃO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 03</div>
+      <h2>Classificação<br>dos Padrões</h2>
+    </div>
+
+    <p class="reveal d1">Os 23 padrões clássicos do GoF (Gang of Four) são divididos em três categorias com base no seu propósito: Criacionais, Estruturais e Comportamentais.</p>
+
+    <div class="pattern-map reveal d2">
+      <div class="pattern-category" style="border-top: 3px solid var(--accent);">
+        <h4><span style="color:var(--accent);">●</span> Criacionais</h4>
+        <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:1rem;">Mecanismos de criação de objetos que aumentam flexibilidade e reutilização.</p>
+        <div>
+          <span class="pattern-tag">Factory Method</span>
+          <span class="pattern-tag">Abstract Factory</span>
+          <span class="pattern-tag current">Builder ★</span>
+          <span class="pattern-tag">Prototype</span>
+          <span class="pattern-tag">Singleton</span>
+        </div>
+      </div>
+      <div class="pattern-category" style="border-top: 3px solid var(--blue);">
+        <h4><span style="color:var(--blue);">●</span> Estruturais</h4>
+        <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:1rem;">Como montar objetos e classes em estruturas maiores mantendo flexibilidade.</p>
+        <div>
+          <span class="pattern-tag">Adapter</span>
+          <span class="pattern-tag">Bridge</span>
+          <span class="pattern-tag">Composite</span>
+          <span class="pattern-tag">Decorator</span>
+          <span class="pattern-tag">Facade</span>
+          <span class="pattern-tag">Flyweight</span>
+          <span class="pattern-tag">Proxy</span>
+        </div>
+      </div>
+      <div class="pattern-category" style="border-top: 3px solid var(--purple);">
+        <h4><span style="color:var(--purple);">●</span> Comportamentais</h4>
+        <p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:1rem;">Algoritmos e designação de responsabilidades entre objetos.</p>
+        <div>
+          <span class="pattern-tag">Chain of Resp.</span>
+          <span class="pattern-tag">Command</span>
+          <span class="pattern-tag">Iterator</span>
+          <span class="pattern-tag">Mediator</span>
+          <span class="pattern-tag">Observer</span>
+          <span class="pattern-tag">State</span>
+          <span class="pattern-tag">Strategy</span>
+          <span class="pattern-tag">Visitor</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== BUILDER: PROPÓSITO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 04 — Builder</div>
+      <h2>O Propósito</h2>
+    </div>
+
+    <div class="reveal d1" style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem;">
+      <div class="big-number">B</div>
+      <div>
+        <p style="font-size:1.3rem;color:var(--text);font-weight:600;margin-bottom:0.5rem;">Construir objetos complexos passo a passo</p>
+        <p>O Builder permite produzir diferentes tipos e representações de um objeto usando o mesmo código de construção, sem precisar de um construtor com dezenas de parâmetros.</p>
+      </div>
+    </div>
+
+    <div class="quote-block reveal d2">
+      <p>"O Builder é um padrão de projeto criacional que permite a você construir objetos complexos passo a passo. O padrão permite que você produza diferentes tipos e representações de um objeto usando o mesmo código de construção."</p>
+      <cite>Refactoring.Guru — Builder Pattern</cite>
+    </div>
+  </section>
+
+  <!-- =================== O PROBLEMA =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 05</div>
+      <h2>O Problema</h2>
+    </div>
+
+    <p class="reveal d1">Imagine um objeto complexo que necessita de inicialização passo a passo de muitos campos e objetos agrupados. Esse tipo de código de inicialização normalmente fica enterrado dentro de um construtor monstruoso com muitos parâmetros. Ou pior: espalhado por todo o código cliente.</p>
+
+    <div class="analogy-container">
+      <div class="reveal-left">
+        <h3 style="margin-bottom:1rem;">A Analogia da Casa</h3>
+        <p style="font-size:0.95rem;color:var(--text-dim);">Para construir uma casa simples, você precisa de paredes, piso, porta, janelas e telhado. Mas e se quiser uma casa maior, com jardim, sistema de aquecimento, encanamento e fiação elétrica?</p>
+        <br>
+        <p style="font-size:0.95rem;color:var(--text-dim);">A abordagem mais simples seria estender a classe base e criar subclasses para cada configuração possível. Mas isso rapidamente leva a uma explosão de subclasses.</p>
+        <br>
+        <p style="font-size:0.95rem;color:var(--text-dim);">Outra opção seria um construtor gigantesco com todos os parâmetros possíveis na classe base. Elimina subclasses, mas cria chamadas monstruosas onde a maioria dos parâmetros fica sem uso.</p>
+      </div>
+
+      <div class="analogy-visual reveal-right" id="house-demo">
+        <div class="house-builder">
+          <div class="house-part roof" id="roof"></div>
+          <div class="house-part walls" id="walls">
+            <div class="window"></div>
+            <div class="door"></div>
+            <div class="window"></div>
+          </div>
+          <div class="house-part foundation" id="foundation"></div>
+        </div>
+        <p class="house-label" id="house-label">Observe a construção passo a passo...</p>
+        <div style="margin-top:1.5rem;">
+          <button class="builder-btn" onclick="buildHouse()">▶ Construir Casa</button>
+          <button class="builder-btn" onclick="resetHouse()">↺ Resetar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block reveal d3" style="margin-top:3rem;">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">❌ O Problema — Construtor Telescópico</span>
+      </div>
+      <div class="code-body"><span class="cm">// Construtor com parâmetros demais</span>
+<span class="cm">// A maioria dos parâmetros fica sem uso na maior parte do tempo</span>
+
+<span class="kw">class</span> <span class="tp">Casa</span> {
+  <span class="fn">constructor</span>(
+    paredes: <span class="tp">number</span>,
+    portas: <span class="tp">number</span>,
+    janelas: <span class="tp">number</span>,
+    temGaragem: <span class="tp">boolean</span>,
+    temPiscina: <span class="tp">boolean</span>,
+    temJardim: <span class="tp">boolean</span>,
+    temEstátuas: <span class="tp">boolean</span>,
+    temSistemaAquecimento: <span class="tp">boolean</span>,
+    <span class="cm">// ... e mais 15 parâmetros</span>
+  ) { }
+}
+
+<span class="cm">// Chamada horrível — o que significa cada boolean?</span>
+<span class="kw">const</span> casa = <span class="kw">new</span> <span class="tp">Casa</span>(<span class="num">4</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>);</div>
+    </div>
+  </section>
+
+  <!-- =================== A SOLUÇÃO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 06</div>
+      <h2>A Solução</h2>
+    </div>
+
+    <p class="reveal d1">O padrão Builder sugere extrair o código de construção do objeto para fora da própria classe e movê-lo para objetos separados chamados <strong style="color:var(--accent);">builders</strong>. O padrão organiza a construção em uma série de etapas (<code>construirParedes()</code>, <code>construirPorta()</code>, etc.). Para criar um objeto, você executa apenas as etapas necessárias.</p>
+
+    <p class="reveal d2">A parte crucial: você não precisa chamar todas as etapas. Pode invocar apenas aquelas que são necessárias para produzir uma configuração específica.</p>
+
+    <div class="timeline reveal d3">
+      <div class="timeline-item reveal d1">
+        <div class="timeline-step">Etapa 1</div>
+        <h3>Interface Builder</h3>
+        <p>Define todas as etapas de construção possíveis, comuns a todos os tipos de builders.</p>
+      </div>
+      <div class="timeline-item reveal d2">
+        <div class="timeline-step">Etapa 2</div>
+        <h3>Concrete Builders</h3>
+        <p>Implementam as etapas de construção de formas diferentes. Cada builder pode produzir um produto completamente diferente.</p>
+      </div>
+      <div class="timeline-item reveal d3">
+        <div class="timeline-step">Etapa 3</div>
+        <h3>Produtos</h3>
+        <p>São os objetos resultantes. Produtos de builders diferentes não precisam compartilhar a mesma interface.</p>
+      </div>
+      <div class="timeline-item reveal d4">
+        <div class="timeline-step">Etapa 4</div>
+        <h3>Director (Opcional)</h3>
+        <p>Define a ordem de execução das etapas de construção. Encapsula receitas comuns de construção para reutilização.</p>
+      </div>
+    </div>
+
+    <!-- DIAGRAMA UML -->
+    <div class="diagram-container reveal-scale">
+      <p style="font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem;text-align:center;">Estrutura do Padrão Builder</p>
+      <div class="uml-diagram">
+        <div class="uml-box" style="border-color: var(--purple);">
+          <div class="uml-box-header" style="background:rgba(168,85,247,0.1);color:var(--purple);">«interface» Builder</div>
+          <div class="uml-box-body">
+            + reset()<br>
+            + setParedes(...)<br>
+            + setPortas(...)<br>
+            + setJanelas(...)<br>
+            + setTelhado(...)
+          </div>
+        </div>
+        <div class="uml-arrow">→</div>
+        <div class="uml-box" style="border-color: var(--blue);">
+          <div class="uml-box-header" style="background:rgba(59,130,246,0.1);color:var(--blue);">CasaBuilder</div>
+          <div class="uml-box-body">
+            - casa: Casa<br>
+            + reset()<br>
+            + setParedes(...)<br>
+            + setPortas(...)<br>
+            + getResultado(): Casa
+          </div>
+        </div>
+        <div class="uml-arrow">→</div>
+        <div class="uml-box" style="border-color: var(--green);">
+          <div class="uml-box-header" style="background:rgba(34,197,94,0.1);color:var(--green);">Casa (Produto)</div>
+          <div class="uml-box-body">
+            - paredes: number<br>
+            - portas: number<br>
+            - janelas: number<br>
+            - temPiscina: bool<br>
+            - temGaragem: bool
+          </div>
+        </div>
+      </div>
+      <div class="uml-diagram" style="margin-top:1.5rem;">
+        <div class="uml-box" style="border-color: var(--accent);">
+          <div class="uml-box-header" style="background:rgba(245,158,11,0.1);color:var(--accent);">Director</div>
+          <div class="uml-box-body">
+            - builder: Builder<br>
+            + construirCasaSimples()<br>
+            + construirMansao()
+          </div>
+        </div>
+        <div class="uml-arrow" style="font-size:1rem;color:var(--text-dim);">usa o builder para<br>orquestrar a construção</div>
+      </div>
+    </div>
+
+    <!-- CODE SOLUTION -->
+    <div class="code-block reveal">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">✅ A Solução — Builder Pattern em TypeScript</span>
+      </div>
+      <div class="code-body"><span class="cm">// Interface Builder</span>
+<span class="kw">interface</span> <span class="tp">CasaBuilder</span> {
+  <span class="fn">reset</span>(): <span class="tp">void</span>;
+  <span class="fn">setParedes</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
+  <span class="fn">setPortas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
+  <span class="fn">setJanelas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
+  <span class="fn">setPiscina</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;
+  <span class="fn">setGaragem</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;
+}
+
+<span class="cm">// Concrete Builder</span>
+<span class="kw">class</span> <span class="tp">CasaConcretaBuilder</span> <span class="kw">implements</span> <span class="tp">CasaBuilder</span> {
+  <span class="kw">private</span> casa: <span class="tp">Casa</span>;
+
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.<span class="fn">reset</span>(); }
+  <span class="fn">reset</span>()      { <span class="kw">this</span>.casa = <span class="kw">new</span> <span class="tp">Casa</span>(); }
+
+  <span class="fn">setParedes</span>(n)  { <span class="kw">this</span>.casa.paredes = n;    <span class="kw">return this</span>; }
+  <span class="fn">setPortas</span>(n)   { <span class="kw">this</span>.casa.portas = n;     <span class="kw">return this</span>; }
+  <span class="fn">setJanelas</span>(n)  { <span class="kw">this</span>.casa.janelas = n;    <span class="kw">return this</span>; }
+  <span class="fn">setPiscina</span>(t)  { <span class="kw">this</span>.casa.piscina = t;    <span class="kw">return this</span>; }
+  <span class="fn">setGaragem</span>(t)  { <span class="kw">this</span>.casa.garagem = t;    <span class="kw">return this</span>; }
+
+  <span class="fn">getResultado</span>(): <span class="tp">Casa</span> {
+    <span class="kw">const</span> result = <span class="kw">this</span>.casa;
+    <span class="kw">this</span>.<span class="fn">reset</span>();
+    <span class="kw">return</span> result;
+  }
+}
+
+<span class="cm">// Director — orquestra receitas de construção</span>
+<span class="kw">class</span> <span class="tp">Arquiteto</span> {
+  <span class="fn">construirCasaSimples</span>(builder: <span class="tp">CasaBuilder</span>) {
+    builder.<span class="fn">reset</span>();
+    builder.<span class="fn">setParedes</span>(<span class="num">4</span>).<span class="fn">setPortas</span>(<span class="num">1</span>).<span class="fn">setJanelas</span>(<span class="num">4</span>);
+  }
+
+  <span class="fn">construirMansao</span>(builder: <span class="tp">CasaBuilder</span>) {
+    builder.<span class="fn">reset</span>();
+    builder.<span class="fn">setParedes</span>(<span class="num">12</span>).<span class="fn">setPortas</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">20</span>)
+           .<span class="fn">setPiscina</span>(<span class="kw">true</span>).<span class="fn">setGaragem</span>(<span class="kw">true</span>);
+  }
+}
+
+<span class="cm">// Uso</span>
+<span class="kw">const</span> builder = <span class="kw">new</span> <span class="tp">CasaConcretaBuilder</span>();
+<span class="kw">const</span> arquiteto = <span class="kw">new</span> <span class="tp">Arquiteto</span>();
+
+arquiteto.<span class="fn">construirMansao</span>(builder);
+<span class="kw">const</span> mansao = builder.<span class="fn">getResultado</span>();
+
+<span class="cm">// Ou sem director — construção customizada</span>
+builder.<span class="fn">setParedes</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">8</span>).<span class="fn">setPiscina</span>(<span class="kw">true</span>);
+<span class="kw">const</span> casaCustom = builder.<span class="fn">getResultado</span>();</div>
+    </div>
+  </section>
+
+  <!-- =================== INTERACTIVE DEMO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 07</div>
+      <h2>Builder Interativo</h2>
+      <p>Clique nas etapas para construir seu objeto passo a passo. Veja o output em tempo real.</p>
+    </div>
+
+    <div class="interactive-builder reveal d1">
+      <p style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--accent);margin-bottom:1rem;">ETAPAS DE CONSTRUÇÃO</p>
+      <div class="builder-controls">
+        <button class="builder-btn" onclick="toggleStep('paredes')">🧱 setParedes(4)</button>
+        <button class="builder-btn" onclick="toggleStep('portas')">🚪 setPortas(2)</button>
+        <button class="builder-btn" onclick="toggleStep('janelas')">🪟 setJanelas(6)</button>
+        <button class="builder-btn" onclick="toggleStep('telhado')">🏠 setTelhado("colonial")</button>
+        <button class="builder-btn" onclick="toggleStep('piscina')">🏊 setPiscina(true)</button>
+        <button class="builder-btn" onclick="toggleStep('garagem')">🚗 setGaragem(true)</button>
+        <button class="builder-btn" onclick="toggleStep('jardim')">🌳 setJardim(true)</button>
+      </div>
+      <div class="builder-output" id="builder-output"><span style="color:var(--text-dim)">// Clique nas etapas acima para construir...
+const builder = new CasaBuilder();
+builder.reset();</span></div>
+      <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+        <button class="builder-btn" onclick="buildResult()" style="border-color:var(--green);color:var(--green);">✓ getResultado()</button>
+        <button class="builder-btn" onclick="resetBuilder()">↺ reset()</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== QUANDO APLICAR =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 08</div>
+      <h2>Quando Aplicar<br>o Builder?</h2>
+    </div>
+
+    <div class="use-case reveal d1">
+      <h4>🔩 Objetos com muitas configurações opcionais</h4>
+      <p>Quando o construtor da classe tem 5, 10, 15 parâmetros opcionais, o Builder elimina o "construtor telescópico" e torna a criação legível.</p>
+    </div>
+
+    <div class="use-case reveal d2">
+      <h4>🌲 Construção de árvores Composite ou estruturas complexas</h4>
+      <p>O Builder permite construir produtos passo a passo e defer a execução de algumas etapas sem quebrar o resultado final. Isso é útil para montar árvores de objetos recursivamente.</p>
+    </div>
+
+    <div class="use-case reveal d3">
+      <h4>🔄 Produtos com diferentes representações</h4>
+      <p>Quando o mesmo processo de construção deve produzir representações diferentes do produto (ex: um carro real vs. um manual do carro), builders concretos diferentes resolvem isso.</p>
+    </div>
+
+    <div class="use-case reveal d4">
+      <h4>📦 Isolamento do produto em construção</h4>
+      <p>O Builder mantém o produto privado durante a construção. O código cliente nunca recebe um objeto incompleto ou em estado instável.</p>
+    </div>
+
+    <!-- Real world examples -->
+    <h3 class="reveal d3" style="margin-top:3rem;margin-bottom:1.5rem;">Exemplos do Mundo Real</h3>
+    <table class="comparison reveal d4">
+      <thead>
+        <tr>
+          <th>Contexto</th>
+          <th>Builder</th>
+          <th>Produto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Query SQL</td>
+          <td>QueryBuilder</td>
+          <td>String SQL (SELECT...WHERE...)</td>
+        </tr>
+        <tr>
+          <td>HTTP Request</td>
+          <td>RequestBuilder</td>
+          <td>Objeto Request configurado</td>
+        </tr>
+        <tr>
+          <td>Docker Compose</td>
+          <td>ServiceBuilder</td>
+          <td>docker-compose.yaml</td>
+        </tr>
+        <tr>
+          <td>K8s Manifests</td>
+          <td>DeploymentBuilder</td>
+          <td>Deployment + Service + Ingress</td>
+        </tr>
+        <tr>
+          <td>StringBuilder</td>
+          <td>append(), insert()</td>
+          <td>String final otimizada</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- =================== EXEMPLO GO =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 09</div>
+      <h2>Exemplo Prático<br>em Go</h2>
+    </div>
+
+    <p class="reveal d1">No exemplo abaixo temos dois builders concretos: <code style="color:var(--green)">NormalBuilder</code> e <code style="color:var(--cyan)">IglooBuilder</code>. Ambos implementam a mesma interface <code style="color:var(--purple)">IBuilder</code>, mas constroem casas completamente diferentes.</p>
+
+    <div class="code-block reveal d2">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">builder.go — Interface e Director</span>
+      </div>
+      <div class="code-body"><span class="kw">package</span> main
+
+<span class="kw">type</span> <span class="tp">IBuilder</span> <span class="kw">interface</span> {
+    <span class="fn">setDoorType</span>()
+    <span class="fn">setWindowType</span>()
+    <span class="fn">setNumFloor</span>()
+    <span class="fn">getHouse</span>() <span class="tp">House</span>
+}
+
+<span class="kw">type</span> <span class="tp">Director</span> <span class="kw">struct</span> {
+    builder <span class="tp">IBuilder</span>
+}
+
+<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">setBuilder</span>(b <span class="tp">IBuilder</span>) {
+    <span class="ac">d</span>.builder = b
+}
+
+<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">buildHouse</span>() <span class="tp">House</span> {
+    <span class="ac">d</span>.builder.<span class="fn">setDoorType</span>()
+    <span class="ac">d</span>.builder.<span class="fn">setWindowType</span>()
+    <span class="ac">d</span>.builder.<span class="fn">setNumFloor</span>()
+    <span class="kw">return</span> <span class="ac">d</span>.builder.<span class="fn">getHouse</span>()
+}
+
+<span class="cm">// main.go</span>
+<span class="kw">func</span> <span class="fn">main</span>() {
+    normalBuilder := <span class="fn">getBuilder</span>(<span class="str">"normal"</span>)
+    iglooBuilder  := <span class="fn">getBuilder</span>(<span class="str">"igloo"</span>)
+
+    director := &<span class="tp">Director</span>{}
+    director.<span class="fn">setBuilder</span>(normalBuilder)
+    normalHouse := director.<span class="fn">buildHouse</span>()
+
+    director.<span class="fn">setBuilder</span>(iglooBuilder)
+    iglooHouse := director.<span class="fn">buildHouse</span>()
+}</div>
+    </div>
+  </section>
+
+  <!-- =================== PRÓS E CONTRAS =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 10</div>
+      <h2>Prós e Contras</h2>
+    </div>
+
+    <div class="pros-cons">
+      <div class="pros reveal-left">
+        <h3>✅ Prós</h3>
+        <div class="list-item">
+          <span class="icon">⬆</span>
+          <span>Construção passo a passo, com possibilidade de adiar etapas ou executá-las recursivamente.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬆</span>
+          <span>Reutilização do mesmo código de construção para diferentes representações do produto.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬆</span>
+          <span>Princípio de Responsabilidade Única: isola código de construção complexo da lógica de negócios.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬆</span>
+          <span>O produto fica privado durante a construção, evitando que o cliente receba objetos incompletos.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬆</span>
+          <span>Suporte a method chaining, tornando o código cliente fluente e legível.</span>
+        </div>
+      </div>
+      <div class="cons reveal-right">
+        <h3>❌ Contras</h3>
+        <div class="list-item">
+          <span class="icon">⬇</span>
+          <span>Complexidade geral do código aumenta, já que são necessárias novas classes para cada builder e seus produtos.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬇</span>
+          <span>Para objetos simples com poucos campos, o overhead do Builder pode não compensar.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬇</span>
+          <span>Em linguagens dinâmicas como Python/JS, named arguments ou object literals muitas vezes resolvem o problema sem precisar do padrão completo.</span>
+        </div>
+        <div class="list-item">
+          <span class="icon">⬇</span>
+          <span>Pode criar acoplamento entre o builder e os detalhes internos do produto.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== RELAÇÃO COM OUTROS PADRÕES =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 11</div>
+      <h2>Relação com<br>Outros Padrões</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="card reveal d1">
+        <h3 style="color:var(--accent);">Builder + Bridge</h3>
+        <p>A classe Director age como abstração, enquanto diferentes builders agem como implementações.</p>
+      </div>
+      <div class="card reveal d2">
+        <h3 style="color:var(--blue);">Builder + Composite</h3>
+        <p>O Builder pode ser utilizado para construir árvores Composite passo a passo, incluindo chamadas recursivas.</p>
+      </div>
+      <div class="card reveal d3">
+        <h3 style="color:var(--purple);">Builder vs. Abstract Factory</h3>
+        <p>Abstract Factory se foca em famílias de objetos relacionados. Builder se foca na construção passo a passo de um objeto complexo.</p>
+      </div>
+      <div class="card reveal d4">
+        <h3 style="color:var(--green);">Builder como Singleton</h3>
+        <p>Builders, Fábricas Abstratas e Protótipos podem todos ser implementados como Singletons quando necessário.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== RESUMO =================== -->
+  <div class="divider"></div>
+
+  <section style="text-align:center;">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center;">Resumo Final</div>
+      <h2>O Builder em<br>uma frase</h2>
+    </div>
+    <div class="quote-block reveal d1" style="max-width:700px;margin:2rem auto;text-align:left;">
+      <p>"Separe a construção de um objeto complexo da sua representação para que o mesmo processo de construção possa criar diferentes representações."</p>
+      <cite>Gang of Four — Design Patterns (1994)</cite>
+    </div>
+
+    <div class="card-grid reveal d2" style="max-width:800px;margin:0 auto;">
+      <div class="card" style="text-align:center;">
+        <div class="big-number" style="font-size:3rem;">🏗️</div>
+        <h3>Tipo</h3>
+        <p style="text-align:center;">Criacional</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-number" style="font-size:3rem;">4</div>
+        <h3>Participantes</h3>
+        <p style="text-align:center;">Builder, ConcreteBuilder, Product, Director</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="big-number" style="font-size:3rem;">∞</div>
+        <h3>Representações</h3>
+        <p style="text-align:center;">Um processo, infinitos produtos diferentes</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Davi Moreira de Santana — 2026</p>
+    <p style="margin-top:0.5rem;">Fonte: <a href="https://refactoring.guru/pt-br/design-patterns/builder" target="_blank">Refactoring.Guru — Builder</a></p>
+  </footer>
+
+</div>
+
+<script>
+// ===== THREE.JS BACKGROUND =====
+(function() {
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 30;
+
+  // Floating building blocks
+  const blocks = [];
+  const geo = new THREE.BoxGeometry(1, 1, 1);
+  const colors = [0xf59e0b, 0xfb923c, 0x3b82f6, 0xa855f7, 0x22c55e, 0x06b6d4];
+
+  for (let i = 0; i < 40; i++) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: colors[Math.floor(Math.random() * colors.length)],
+      wireframe: true,
+      transparent: true,
+      opacity: 0.12 + Math.random() * 0.08
+    });
+    const size = 0.4 + Math.random() * 1.2;
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(size, size, size),
+      mat
+    );
+    mesh.position.set(
+      (Math.random() - 0.5) * 50,
+      (Math.random() - 0.5) * 50,
+      (Math.random() - 0.5) * 30
+    );
+    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+    mesh.userData = {
+      rotSpeed: (Math.random() - 0.5) * 0.01,
+      floatSpeed: 0.002 + Math.random() * 0.005,
+      floatOffset: Math.random() * Math.PI * 2
+    };
+    scene.add(mesh);
+    blocks.push(mesh);
+  }
+
+  let scrollY = 0;
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = Date.now() * 0.001;
+    blocks.forEach(b => {
+      b.rotation.x += b.userData.rotSpeed;
+      b.rotation.y += b.userData.rotSpeed * 0.7;
+      b.position.y += Math.sin(t * b.userData.floatSpeed * 10 + b.userData.floatOffset) * 0.003;
+    });
+    camera.position.y = -scrollY * 0.005;
+    camera.rotation.x = scrollY * 0.00003;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+  observer.observe(el);
+});
+
+// ===== HOUSE BUILDER ANIMATION =====
+function buildHouse() {
+  const parts = ['foundation', 'walls', 'roof'];
+  const labels = ['Construindo fundação...', 'Levantando paredes, porta e janelas...', 'Instalando telhado... Casa pronta! 🏠'];
+  parts.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('built');
+      document.getElementById('house-label').textContent = labels[i];
+    }, (i + 1) * 700);
+  });
+}
+
+function resetHouse() {
+  ['foundation', 'walls', 'roof'].forEach(id => {
+    document.getElementById(id).classList.remove('built');
+  });
+  document.getElementById('house-label').textContent = 'Observe a construção passo a passo...';
+}
+
+// ===== INTERACTIVE BUILDER =====
+const builderSteps = {};
+const stepValues = {
+  paredes: 'builder.setParedes(4);',
+  portas: 'builder.setPortas(2);',
+  janelas: 'builder.setJanelas(6);',
+  telhado: 'builder.setTelhado("colonial");',
+  piscina: 'builder.setPiscina(true);',
+  garagem: 'builder.setGaragem(true);',
+  jardim: 'builder.setJardim(true);'
+};
+
+function toggleStep(step) {
+  builderSteps[step] = !builderSteps[step];
+  const btns = document.querySelectorAll('.builder-controls .builder-btn');
+  const keys = Object.keys(stepValues);
+  btns.forEach((btn, i) => {
+    if (keys[i] === step) btn.classList.toggle('active');
+  });
+  updateBuilderOutput();
+}
+
+function updateBuilderOutput() {
+  const el = document.getElementById('builder-output');
+  let code = 'const builder = new CasaBuilder();\nbuilder.reset();\n';
+  const active = Object.entries(builderSteps).filter(([,v]) => v);
+  if (active.length === 0) {
+    code += '\n// Clique nas etapas acima para construir...';
+  } else {
+    code += '\n';
+    active.forEach(([key]) => {
+      code += stepValues[key] + '\n';
+    });
+  }
+  el.textContent = code;
+}
+
+function buildResult() {
+  const el = document.getElementById('builder-output');
+  const active = Object.entries(builderSteps).filter(([,v]) => v);
+  let code = el.textContent + '\n';
+  code += 'const casa = builder.getResultado();\n';
+  code += '\n// Casa { ';
+  const props = [];
+  if (builderSteps.paredes) props.push('paredes: 4');
+  if (builderSteps.portas)  props.push('portas: 2');
+  if (builderSteps.janelas) props.push('janelas: 6');
+  if (builderSteps.telhado) props.push('telhado: "colonial"');
+  if (builderSteps.piscina) props.push('piscina: true');
+  if (builderSteps.garagem) props.push('garagem: true');
+  if (builderSteps.jardim)  props.push('jardim: true');
+  code += props.join(', ') + ' }';
+  el.textContent = code;
+}
+
+function resetBuilder() {
+  Object.keys(builderSteps).forEach(k => builderSteps[k] = false);
+  document.querySelectorAll('.builder-controls .builder-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('builder-output').textContent = '// Clique nas etapas acima para construir...\nconst builder = new CasaBuilder();\nbuilder.reset();';
+}
+</script>
+</body>
+</html>
