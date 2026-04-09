@@ -1573,31 +1573,129 @@ query = <span class="tp">QueryBuilder</span>(<span class="str">'users'</span>)<b
     </div>
   </section>
 
-  <!-- =================== RELAÇÃO COM OUTROS PADRÕES =================== -->
+  <!-- =================== PARÂMETROS OBRIGATÓRIOS =================== -->
   <div class="divider"></div>
 
   <section>
     <div class="reveal">
       <div class="section-label">Capítulo 13</div>
+      <h2>Parâmetros<br>Obrigatórios</h2>
+    </div>
+
+    <p class="reveal d1">Às vezes um objeto não pode existir sem uma determinada propriedade, como um <code style="color:var(--green)">name</code> ou um <code style="color:var(--cyan)">id</code>. Existem duas formas de garantir isso no Builder.</p>
+
+    <div class="card-grid reveal d2" style="margin-top:2rem;">
+      <div class="card">
+        <h3 style="color:var(--accent);">Opção 1: Construtor do Builder</h3>
+        <p>O parâmetro obrigatório vai direto no <code style="color:var(--green)">constructor</code> do Builder. Sem ele, você nem consegue instanciar o Builder, o erro aparece na hora certa, antes de qualquer método ser chamado.</p>
+        <p style="margin-top:0.75rem;color:var(--muted);font-size:0.9rem;">Ideal quando o parâmetro é estrutural, o objeto simplesmente não faz sentido sem ele.</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--blue);">Opção 2: Validação no build()</h3>
+        <p>O parâmetro pode ser definido em qualquer momento via método encadeado, mas o <code style="color:var(--cyan)">build()</code> verifica se ele foi informado antes de retornar o objeto. Se não foi, lança um erro.</p>
+        <p style="margin-top:0.75rem;color:var(--muted);font-size:0.9rem;">Ideal quando você quer manter a flexibilidade de ordem nas chamadas, mas ainda impor a regra no final.</p>
+      </div>
+    </div>
+
+    <div class="code-block reveal d3" style="margin-top:2rem;">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">Opção 1 — Parâmetro no construtor</span>
+      </div>
+      <div class="code-body"><span class="kw">class</span> <span class="tp">BurgerBuilder</span> {<br>
+<div style="margin-left:20px;"><span class="cm">// name é obrigatório: sem ele, o Builder nem é criado</span><br></div>
+<div style="margin-left:20px;"><span class="fn">constructor</span>(<span class="ac">name</span>) {<br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.name   = <span class="ac">name</span><br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.bacon  = <span class="kw">false</span><br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.salad  = <span class="kw">false</span><br></div>
+<div style="margin-left:20px;">}<br></div>
+<br>
+<div style="margin-left:20px;"><span class="fn">addBacon</span>() { <span class="kw">this</span>.bacon = <span class="kw">true</span>; <span class="kw">return this</span> }<br></div>
+<div style="margin-left:20px;"><span class="fn">addSalad</span>() { <span class="kw">this</span>.salad = <span class="kw">true</span>; <span class="kw">return this</span> }<br></div>
+<br>
+<div style="margin-left:20px;"><span class="fn">build</span>() {<br></div>
+<div style="margin-left:40px;"><span class="kw">return new</span> <span class="tp">Burger</span>(<span class="kw">this</span>)<br></div>
+<div style="margin-left:20px;">}<br></div>
+}<br>
+<br>
+<span class="cm">// Uso correto</span><br>
+<span class="kw">const</span> burger = <span class="kw">new</span> <span class="tp">BurgerBuilder</span>(<span class="str">"Cheddar Burger"</span>)<br>
+<div style="margin-left:20px;">.<span class="fn">addBacon</span>()<br></div>
+<div style="margin-left:20px;">.<span class="fn">addSalad</span>()<br></div>
+<div style="margin-left:20px;">.<span class="fn">build</span>()<br></div>
+<br>
+<span class="cm">// Erro imediato: não é possível instanciar sem o name</span><br>
+<span class="kw">const</span> invalid = <span class="kw">new</span> <span class="tp">BurgerBuilder</span>() <span class="cm">// ← erro aqui</span><br></div>
+    </div>
+
+    <div class="code-block reveal d4" style="margin-top:2rem;">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">Opção 2 — Validação no build()</span>
+      </div>
+      <div class="code-body"><span class="kw">class</span> <span class="tp">BurgerBuilder</span> {<br>
+<div style="margin-left:20px;"><span class="fn">constructor</span>() {<br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.name  = <span class="kw">null</span><br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.bacon = <span class="kw">false</span><br></div>
+<div style="margin-left:40px;"><span class="kw">this</span>.salad = <span class="kw">false</span><br></div>
+<div style="margin-left:20px;">}<br></div>
+<br>
+<div style="margin-left:20px;"><span class="fn">setName</span>(<span class="ac">name</span>) { <span class="kw">this</span>.name = <span class="ac">name</span>; <span class="kw">return this</span> }<br></div>
+<div style="margin-left:20px;"><span class="fn">addBacon</span>()     { <span class="kw">this</span>.bacon = <span class="kw">true</span>; <span class="kw">return this</span> }<br></div>
+<div style="margin-left:20px;"><span class="fn">addSalad</span>()     { <span class="kw">this</span>.salad = <span class="kw">true</span>; <span class="kw">return this</span> }<br></div>
+<br>
+<div style="margin-left:20px;"><span class="fn">build</span>() {<br></div>
+<div style="margin-left:40px;"><span class="cm">// validação centralizada antes de retornar</span><br></div>
+<div style="margin-left:40px;"><span class="kw">if</span> (!<span class="kw">this</span>.name) <span class="kw">throw new</span> <span class="tp">Error</span>(<span class="str">"name é obrigatório"</span>)<br></div>
+<div style="margin-left:40px;"><span class="kw">return new</span> <span class="tp">Burger</span>(<span class="kw">this</span>)<br></div>
+<div style="margin-left:20px;">}<br></div>
+}<br>
+<br>
+<span class="cm">// A ordem das chamadas é livre</span><br>
+<span class="kw">const</span> burger = <span class="kw">new</span> <span class="tp">BurgerBuilder</span>()<br>
+<div style="margin-left:20px;">.<span class="fn">addBacon</span>()<br></div>
+<div style="margin-left:20px;">.<span class="fn">setName</span>(<span class="str">"Cheddar Burger"</span>) <span class="cm">// pode vir em qualquer posição</span><br></div>
+<div style="margin-left:20px;">.<span class="fn">addSalad</span>()<br></div>
+<div style="margin-left:20px;">.<span class="fn">build</span>()<br></div>
+<br>
+<span class="cm">// Erro só aparece no final</span><br>
+<span class="kw">const</span> invalid = <span class="kw">new</span> <span class="tp">BurgerBuilder</span>().<span class="fn">addBacon</span>().<span class="fn">build</span>() <span class="cm">// ← erro aqui</span><br></div>
+    </div>
+  </section>
+
+  <!-- =================== RELAÇÃO COM OUTROS PADRÕES =================== -->
+  <div class="divider"></div>
+
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 14</div>
       <h2>Relação com<br>Outros Padrões</h2>
     </div>
 
     <div class="card-grid">
       <div class="card reveal d1">
         <h3 style="color:var(--accent);">Builder + Bridge</h3>
-        <p>A classe Director age como abstração, enquanto diferentes builders agem como implementações.</p>
+        <p><strong>Bridge</strong> é um padrão que separa "o que um objeto faz" de "como ele faz". Imagine um controle remoto (abstração) que pode funcionar com qualquer TV (implementação), você troca a TV sem mudar o controle.</p>
+        <p style="margin-top:0.75rem;">No Builder, essa divisão aparece naturalmente: o <strong>Director</strong> é a abstração (sabe <em>o que</em> construir e em qual ordem), enquanto cada <strong>Builder concreto</strong> é a implementação (sabe <em>como</em> montar cada parte). Você pode trocar o Builder sem alterar o Director.</p>
       </div>
       <div class="card reveal d2">
         <h3 style="color:var(--blue);">Builder + Composite</h3>
-        <p>O Builder pode ser utilizado para construir árvores Composite passo a passo, incluindo chamadas recursivas.</p>
+        <p><strong>Composite</strong> é um padrão para estruturas em árvore, onde um objeto pode conter outros objetos do mesmo tipo, como uma pasta que contém arquivos e outras pastas.</p>
+        <p style="margin-top:0.75rem;">Construir essa hierarquia manualmente é complicado. O Builder encaixa perfeitamente aqui: você usa seus métodos passo a passo para adicionar nós, filhos e subárvores, deixando o processo organizado e legível, inclusive com chamadas recursivas para ramificações profundas.</p>
       </div>
       <div class="card reveal d3">
         <h3 style="color:var(--purple);">Builder vs. Abstract Factory</h3>
-        <p>Abstract Factory se foca em famílias de objetos relacionados. Builder se foca na construção passo a passo de um objeto complexo.</p>
+        <p><strong>Abstract Factory</strong> também cria objetos, mas o foco é diferente: ele produz <em>famílias inteiras</em> de objetos relacionados de uma vez, como uma fábrica que entrega cadeira, mesa e sofá todos no mesmo estilo.</p>
+        <p style="margin-top:0.75rem;">O Builder, por outro lado, monta <em>um único objeto complexo</em> passo a passo. A diferença prática: se você precisa de controle sobre cada etapa da construção (e quer o objeto só no final), use Builder. Se precisa de vários objetos compatíveis entre si de uma vez, use Abstract Factory.</p>
       </div>
       <div class="card reveal d4">
         <h3 style="color:var(--green);">Builder como Singleton</h3>
-        <p>Builders, Fábricas Abstratas e Protótipos podem todos ser implementados como Singletons quando necessário.</p>
+        <p><strong>Singleton</strong> é um padrão que garante que uma classe tenha apenas uma instância em toda a aplicação, como uma conexão única com o banco de dados que todos os módulos compartilham.</p>
+        <p style="margin-top:0.75rem;">Em alguns cenários, faz sentido que o próprio Builder (ou a Abstract Factory / Prototype) seja um Singleton: assim, toda a aplicação reutiliza o mesmo builder configurado, evitando criar múltiplas instâncias desnecessárias de um objeto que é caro de inicializar.</p>
       </div>
     </div>
   </section>
