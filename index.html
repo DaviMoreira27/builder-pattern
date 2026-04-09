@@ -1030,25 +1030,36 @@ footer a {
         <div class="code-dot g"></div>
         <span class="code-title">❌ O Problema — Construtor Telescópico</span>
       </div>
-      <div class="code-body"><span class="cm">// Construtor com parâmetros demais</span>
-<span class="cm">// A maioria dos parâmetros fica sem uso na maior parte do tempo</span>
+      <div class="code-body"><span class="cm">// Construtor com parâmetros demais</span><br>
+<span class="cm">// A maioria dos parâmetros fica sem uso na maior parte do tempo</span><br>
 
-<span class="kw">class</span> <span class="tp">Casa</span> {
-  <span class="fn">constructor</span>(
-    paredes: <span class="tp">number</span>,
-    portas: <span class="tp">number</span>,
-    janelas: <span class="tp">number</span>,
-    temGaragem: <span class="tp">boolean</span>,
-    temPiscina: <span class="tp">boolean</span>,
-    temJardim: <span class="tp">boolean</span>,
-    temEstátuas: <span class="tp">boolean</span>,
-    temSistemaAquecimento: <span class="tp">boolean</span>,
-    <span class="cm">// ... e mais 15 parâmetros</span>
-  ) { }
+<span class="kw">class</span> <span class="tp">Casa</span> {<br>
+<div style="margin-left: 20px;"><span class="fn">constructor</span>(<br>
+<div style="margin-left: 40px;">paredes: <span class="tp">number</span>,<br></div>
+<div style="margin-left: 40px;">portas: <span class="tp">number</span>,<br></div>
+<div style="margin-left: 40px;">janelas: <span class="tp">number</span>,<br></div>
+<div style="margin-left: 40px;">temGaragem: <span class="tp">boolean</span>,<br></div>
+<div style="margin-left: 40px;">temPiscina: <span class="tp">boolean</span>,<br></div>
+<div style="margin-left: 40px;">temJardim: <span class="tp">boolean</span>,<br></div>
+<div style="margin-left: 40px;">temEstátuas: <span class="tp">boolean</span>,<br></div>
+<div style="margin-left: 40px;">temSistemaAquecimento: <span class="tp">boolean</span>,<br></div>
+<div style="margin-left: 40px;"><span class="cm">// ... e mais 15 parâmetros</span><br></div>
+) { }<br>
+</div>
 }
-
-<span class="cm">// Chamada horrível — o que significa cada boolean?</span>
-<span class="kw">const</span> casa = <span class="kw">new</span> <span class="tp">Casa</span>(<span class="num">4</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>);</div>
+<br>
+<br>
+<span class="cm">// Chamada horrível — o que significa cada boolean?</span><br>
+<span class="kw">const</span> casa = <span class="kw">new</span> <span class="tp">Casa</span>(<br>
+<div style="margin-left: 20px;"><span class="num">4</span>,<br></div>
+<div style="margin-left: 20px;"><span class="num">1</span>,<br></div>
+<div style="margin-left: 20px;"><span class="num">4</span>,<br></div>
+<div style="margin-left: 20px;"><span class="kw">true</span>,<br></div>
+<div style="margin-left: 20px;"><span class="kw">false</span>,<br></div>
+<div style="margin-left: 20px;"><span class="kw">true</span>,<br></div>
+<div style="margin-left: 20px;"><span class="kw">false</span>,<br></div>
+<div style="margin-left: 20px;"><span class="kw">true</span><br></div>
+);<br></div>
     </div>
   </section>
 
@@ -1147,59 +1158,63 @@ footer a {
         <span class="code-title">✅ A Solução — Builder Pattern em TypeScript</span>
       </div>
       <div class="code-body"><span class="cm">// Interface Builder</span>
-<span class="kw">interface</span> <span class="tp">CasaBuilder</span> {
-  <span class="fn">reset</span>(): <span class="tp">void</span>;
-  <span class="fn">setParedes</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
-  <span class="fn">setPortas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
-  <span class="fn">setJanelas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;
-  <span class="fn">setPiscina</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;
-  <span class="fn">setGaragem</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;
-}
+<span class="cm">// Interface Builder</span><br>
+<span class="kw">interface</span> <span class="tp">CasaBuilder</span> {<br>
+<div style="margin-left: 20px;"><span class="fn">reset</span>(): <span class="tp">void</span>;<br></div>
+<div style="margin-left: 20px;"><span class="fn">setParedes</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;<br></div>
+<div style="margin-left: 20px;"><span class="fn">setPortas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;<br></div>
+<div style="margin-left: 20px;"><span class="fn">setJanelas</span>(n: <span class="tp">number</span>): <span class="tp">CasaBuilder</span>;<br></div>
+<div style="margin-left: 20px;"><span class="fn">setPiscina</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;<br></div>
+<div style="margin-left: 20px;"><span class="fn">setGaragem</span>(tem: <span class="tp">boolean</span>): <span class="tp">CasaBuilder</span>;<br></div>
+}<br>
 
-<span class="cm">// Concrete Builder</span>
-<span class="kw">class</span> <span class="tp">CasaConcretaBuilder</span> <span class="kw">implements</span> <span class="tp">CasaBuilder</span> {
-  <span class="kw">private</span> casa: <span class="tp">Casa</span>;
+<span class="cm">// Concrete Builder</span><br>
+<span class="kw">class</span> <span class="tp">CasaConcretaBuilder</span> <span class="kw">implements</span> <span class="tp">CasaBuilder</span> {<br>
+<div style="margin-left: 20px;"><span class="kw">private</span> casa: <span class="tp">Casa</span>;<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">constructor</span>() { <span class="kw">this</span>.<span class="fn">reset</span>(); }<br></div>
+<div style="margin-left: 20px;"><span class="fn">reset</span>()      { <span class="kw">this</span>.casa = <span class="kw">new</span> <span class="tp">Casa</span>(); }<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">setParedes</span>(n)  { <span class="kw">this</span>.casa.paredes = n;    <span class="kw">return this</span>; }<br></div>
+<div style="margin-left: 20px;"><span class="fn">setPortas</span>(n)   { <span class="kw">this</span>.casa.portas = n;     <span class="kw">return this</span>; }<br></div>
+<div style="margin-left: 20px;"><span class="fn">setJanelas</span>(n)  { <span class="kw">this</span>.casa.janelas = n;    <span class="kw">return this</span>; }<br></div>
+<div style="margin-left: 20px;"><span class="fn">setPiscina</span>(t)  { <span class="kw">this</span>.casa.piscina = t;    <span class="kw">return this</span>; }<br></div>
+<div style="margin-left: 20px;"><span class="fn">setGaragem</span>(t)  { <span class="kw">this</span>.casa.garagem = t;    <span class="kw">return this</span>; }<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">getResultado</span>(): <span class="tp">Casa</span> {<br>
+<div style="margin-left: 40px;"><span class="kw">const</span> result = <span class="kw">this</span>.casa;<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.<span class="fn">reset</span>();<br></div>
+<div style="margin-left: 40px;"><span class="kw">return</span> result;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+</div>
+}<br>
 
-  <span class="fn">constructor</span>() { <span class="kw">this</span>.<span class="fn">reset</span>(); }
-  <span class="fn">reset</span>()      { <span class="kw">this</span>.casa = <span class="kw">new</span> <span class="tp">Casa</span>(); }
+<span class="cm">// Director — orquestra receitas de construção</span><br>
+<span class="kw">class</span> <span class="tp">Arquiteto</span> {<br>
+<div style="margin-left: 20px;"><span class="fn">construirCasaSimples</span>(builder: <span class="tp">CasaBuilder</span>) {<br>
+<div style="margin-left: 40px;">builder.<span class="fn">reset</span>();<br></div>
+<div style="margin-left: 40px;">builder.<span class="fn">setParedes</span>(<span class="num">4</span>).<span class="fn">setPortas</span>(<span class="num">1</span>).<span class="fn">setJanelas</span>(<span class="num">4</span>);<br></div>
+<div style="margin-left: 20px;">}<br></div>
+</div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">construirMansao</span>(builder: <span class="tp">CasaBuilder</span>) {<br>
+<div style="margin-left: 40px;">builder.<span class="fn">reset</span>();<br></div>
+<div style="margin-left: 40px;">builder.<span class="fn">setParedes</span>(<span class="num">12</span>).<span class="fn">setPortas</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">20</span>)<br>
+<div style="margin-left: 40px;">           .<span class="fn">setPiscina</span>(<span class="kw">true</span>).<span class="fn">setGaragem</span>(<span class="kw">true</span>);<br></div>
+<div style="margin-left: 20px;">}<br></div>
+</div>
+}<br>
 
-  <span class="fn">setParedes</span>(n)  { <span class="kw">this</span>.casa.paredes = n;    <span class="kw">return this</span>; }
-  <span class="fn">setPortas</span>(n)   { <span class="kw">this</span>.casa.portas = n;     <span class="kw">return this</span>; }
-  <span class="fn">setJanelas</span>(n)  { <span class="kw">this</span>.casa.janelas = n;    <span class="kw">return this</span>; }
-  <span class="fn">setPiscina</span>(t)  { <span class="kw">this</span>.casa.piscina = t;    <span class="kw">return this</span>; }
-  <span class="fn">setGaragem</span>(t)  { <span class="kw">this</span>.casa.garagem = t;    <span class="kw">return this</span>; }
-
-  <span class="fn">getResultado</span>(): <span class="tp">Casa</span> {
-    <span class="kw">const</span> result = <span class="kw">this</span>.casa;
-    <span class="kw">this</span>.<span class="fn">reset</span>();
-    <span class="kw">return</span> result;
-  }
-}
-
-<span class="cm">// Director — orquestra receitas de construção</span>
-<span class="kw">class</span> <span class="tp">Arquiteto</span> {
-  <span class="fn">construirCasaSimples</span>(builder: <span class="tp">CasaBuilder</span>) {
-    builder.<span class="fn">reset</span>();
-    builder.<span class="fn">setParedes</span>(<span class="num">4</span>).<span class="fn">setPortas</span>(<span class="num">1</span>).<span class="fn">setJanelas</span>(<span class="num">4</span>);
-  }
-
-  <span class="fn">construirMansao</span>(builder: <span class="tp">CasaBuilder</span>) {
-    builder.<span class="fn">reset</span>();
-    builder.<span class="fn">setParedes</span>(<span class="num">12</span>).<span class="fn">setPortas</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">20</span>)
-           .<span class="fn">setPiscina</span>(<span class="kw">true</span>).<span class="fn">setGaragem</span>(<span class="kw">true</span>);
-  }
-}
-
-<span class="cm">// Uso</span>
-<span class="kw">const</span> builder = <span class="kw">new</span> <span class="tp">CasaConcretaBuilder</span>();
-<span class="kw">const</span> arquiteto = <span class="kw">new</span> <span class="tp">Arquiteto</span>();
-
-arquiteto.<span class="fn">construirMansao</span>(builder);
-<span class="kw">const</span> mansao = builder.<span class="fn">getResultado</span>();
-
-<span class="cm">// Ou sem director — construção customizada</span>
-builder.<span class="fn">setParedes</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">8</span>).<span class="fn">setPiscina</span>(<span class="kw">true</span>);
-<span class="kw">const</span> casaCustom = builder.<span class="fn">getResultado</span>();</div>
+<span class="cm">// Uso</span><br>
+<span class="kw">const</span> builder = <span class="kw">new</span> <span class="tp">CasaConcretaBuilder</span>();<br>
+<span class="kw">const</span> arquiteto = <span class="kw">new</span> <span class="tp">Arquiteto</span>();<br>
+<br>
+arquiteto.<span class="fn">construirMansao</span>(builder);<br>
+<span class="kw">const</span> mansao = builder.<span class="fn">getResultado</span>();<br>
+<br>
+<span class="cm">// Ou sem director — construção customizada</span><br>
+builder.<span class="fn">setParedes</span>(<span class="num">6</span>).<span class="fn">setJanelas</span>(<span class="num">8</span>).<span class="fn">setPiscina</span>(<span class="kw">true</span>);<br>
+<span class="kw">const</span> casaCustom = builder.<span class="fn">getResultado</span>();<br></div>
     </div>
   </section>
 
@@ -1321,42 +1336,185 @@ builder.reset();</span></div>
         <div class="code-dot g"></div>
         <span class="code-title">builder.go — Interface e Director</span>
       </div>
-      <div class="code-body"><span class="kw">package</span> main
+      <div class="code-body"><span class="kw">package</span> main<br>
+<br>
+<span class="kw">type</span> <span class="tp">IBuilder</span> <span class="kw">interface</span> {<br>
+<div style="margin-left: 20px;"><span class="fn">setDoorType</span>()<br></div>
+<div style="margin-left: 20px;"><span class="fn">setWindowType</span>()<br></div>
+<div style="margin-left: 20px;"><span class="fn">setNumFloor</span>()<br></div>
+<div style="margin-left: 20px;"><span class="fn">getHouse</span>() <span class="tp">House</span><br></div>
+}<br>
+<br>
+<span class="kw">type</span> <span class="tp">Director</span> <span class="kw">struct</span> {<br>
+<div style="margin-left: 20px;">builder <span class="tp">IBuilder</span><br></div>
+}<br>
+<br>
+<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">setBuilder</span>(b <span class="tp">IBuilder</span>) {<br>
+<div style="margin-left: 20px;"><span class="ac">d</span>.builder = b<br></div>
+}<br>
+<br>
+<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">buildHouse</span>() <span class="tp">House</span> {<br>
+<div style="margin-left: 20px;"><span class="ac">d</span>.builder.<span class="fn">setDoorType</span>()<br></div>
+<div style="margin-left: 20px;"><span class="ac">d</span>.builder.<span class="fn">setWindowType</span>()<br></div>
+<div style="margin-left: 20px;"><span class="ac">d</span>.builder.<span class="fn">setNumFloor</span>()<br></div>
+<div style="margin-left: 20px;"><span class="kw">return</span> <span class="ac">d</span>.builder.<span class="fn">getHouse</span>()<br></div>
+}<br>
+<br>
+<span class="cm">// main.go</span><br>
+<span class="kw">func</span> <span class="fn">main</span>() {<br>
+<div style="margin-left: 20px;">normalBuilder := <span class="fn">getBuilder</span>(<span class="str">"normal"</span>)<br></div>
+<div style="margin-left: 20px;">iglooBuilder  := <span class="fn">getBuilder</span>(<span class="str">"igloo"</span>)<br></div>
+<br>
+<div style="margin-left: 20px;">director := &<span class="tp">Director</span>{}<br></div>
+<div style="margin-left: 20px;">director.<span class="fn">setBuilder</span>(normalBuilder)<br></div>
+<div style="margin-left: 20px;">normalHouse := director.<span class="fn">buildHouse</span>()<br></div>
+<br>
+<div style="margin-left: 20px;">director.<span class="fn">setBuilder</span>(iglooBuilder)<br></div>
+<div style="margin-left: 20px;">iglooHouse := director.<span class="fn">buildHouse</span>()<br></div>
+}<br></div>
+    </div>
+  </section>
 
-<span class="kw">type</span> <span class="tp">IBuilder</span> <span class="kw">interface</span> {
-    <span class="fn">setDoorType</span>()
-    <span class="fn">setWindowType</span>()
-    <span class="fn">setNumFloor</span>()
-    <span class="fn">getHouse</span>() <span class="tp">House</span>
-}
+  <!-- =================== EXEMPLOS PRÁTICOS =================== -->
+  <div class="divider"></div>
 
-<span class="kw">type</span> <span class="tp">Director</span> <span class="kw">struct</span> {
-    builder <span class="tp">IBuilder</span>
-}
+  <section>
+    <div class="reveal">
+      <div class="section-label">Capítulo 13</div>
+      <h2>Exemplos Práticos</h2>
+      <p>Um HTTP Request Builder simplifica a construção de requisições HTTP complexas. Em vez de passar múltiplos parâmetros para uma função, você encadeia métodos para configurar cada aspecto da requisição de forma legível.</p>
+    </div>
 
-<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">setBuilder</span>(b <span class="tp">IBuilder</span>) {
-    <span class="ac">d</span>.builder = b
-}
+    <div class="code-block reveal d1" style="margin-top:2rem;">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">🔗 HTTP Request Builder — Node.js</span>
+      </div>
+      <div class="code-body"><span class="cm">// HTTP Request Builder com method chaining</span><br>
+<span class="kw">class</span> <span class="tp">HTTPRequestBuilder</span> {<br>
+<div style="margin-left: 20px;"><span class="fn">constructor</span>(url) {<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.url = url;<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.method = <span class="str">'GET'</span>;<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.headers = {};<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.params = {};<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.timeout = <span class="num">5000</span>;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">setMethod</span>(method) {<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.method = method;<br></div>
+<div style="margin-left: 40px;"><span class="kw">return this</span>;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">setHeader</span>(key, value) {<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.headers[key] = value;<br></div>
+<div style="margin-left: 40px;"><span class="kw">return this</span>;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">setParam</span>(key, value) {<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.params[key] = value;<br></div>
+<div style="margin-left: 40px;"><span class="kw">return this</span>;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">setTimeout</span>(ms) {<br></div>
+<div style="margin-left: 40px;"><span class="kw">this</span>.timeout = ms;<br></div>
+<div style="margin-left: 40px;"><span class="kw">return this</span>;<br></div>
+<div style="margin-left: 20px;">}<br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">build</span>() {<br></div>
+<div style="margin-left: 40px;"><span class="kw">return</span> {<br></div>
+<div style="margin-left: 60px;">url: <span class="kw">this</span>.url,<br></div>
+<div style="margin-left: 60px;">method: <span class="kw">this</span>.method,<br></div>
+<div style="margin-left: 60px;">headers: <span class="kw">this</span>.headers,<br></div>
+<div style="margin-left: 60px;">params: <span class="kw">this</span>.params,<br></div>
+<div style="margin-left: 60px;">timeout: <span class="kw">this</span>.timeout<br></div>
+<div style="margin-left: 40px;">};<br></div>
+<div style="margin-left: 20px;">}<br></div>
+}<br><br>
+<span class="cm">// Uso</span><br>
+<span class="kw">const</span> request = <span class="kw">new</span> <span class="tp">HTTPRequestBuilder</span>(<span class="str">'https://api.example.com/users'</span>)<br>
+<div style="margin-left: 20px;">.<span class="fn">setMethod</span>(<span class="str">'POST'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">setHeader</span>(<span class="str">'Content-Type'</span>, <span class="str">'application/json'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">setHeader</span>(<span class="str">'Authorization'</span>, <span class="str">'Bearer token123'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">setParam</span>(<span class="str">'name'</span>, <span class="str">'John'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">setParam</span>(<span class="str">'email'</span>, <span class="str">'john@example.com'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">setTimeout</span>(<span class="num">10000</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">build</span>();<br></div>
+      </div>
+    </div>
+  </section>
 
-<span class="kw">func</span> (<span class="ac">d</span> *<span class="tp">Director</span>) <span class="fn">buildHouse</span>() <span class="tp">House</span> {
-    <span class="ac">d</span>.builder.<span class="fn">setDoorType</span>()
-    <span class="ac">d</span>.builder.<span class="fn">setWindowType</span>()
-    <span class="ac">d</span>.builder.<span class="fn">setNumFloor</span>()
-    <span class="kw">return</span> <span class="ac">d</span>.builder.<span class="fn">getHouse</span>()
-}
+  <section>
+    <div class="reveal" style="margin-top: -10rem;">
+      <p>Um SQL Query Builder permite construir queries complexas de forma programática e intuitiva. Em vez de concatenar strings SQL manualmente, você usa métodos para adicionar cláusulas WHERE, JOINs, ORDER BY e LIMIT, mantendo o código limpo e seguro contra SQL injection.</p>
+    </div>
 
-<span class="cm">// main.go</span>
-<span class="kw">func</span> <span class="fn">main</span>() {
-    normalBuilder := <span class="fn">getBuilder</span>(<span class="str">"normal"</span>)
-    iglooBuilder  := <span class="fn">getBuilder</span>(<span class="str">"igloo"</span>)
-
-    director := &<span class="tp">Director</span>{}
-    director.<span class="fn">setBuilder</span>(normalBuilder)
-    normalHouse := director.<span class="fn">buildHouse</span>()
-
-    director.<span class="fn">setBuilder</span>(iglooBuilder)
-    iglooHouse := director.<span class="fn">buildHouse</span>()
-}</div>
+    <div class="code-block reveal d2" style="margin-top:2rem;">
+      <div class="code-header">
+        <div class="code-dot r"></div>
+        <div class="code-dot y"></div>
+        <div class="code-dot g"></div>
+        <span class="code-title">🗄️ SQL Query Builder — Python</span>
+      </div>
+      <div class="code-body"><span class="cm"># SQL ORM Query Builder com method chaining</span><br>
+<span class="kw">class</span> <span class="tp">QueryBuilder</span>:<br>
+<div style="margin-left: 20px;"><span class="fn">__init__</span>(<span class="ac">self</span>, table):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.table = table<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.select_cols = [<span class="str">'*'</span>]<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.where_conditions = []<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.joins = []<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.order_by_col = <span class="kw">None</span><br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.limit_val = <span class="kw">None</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">select</span>(<span class="ac">self</span>, *cols):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.select_cols = list(cols) <span class="kw">if</span> cols <span class="kw">else</span> [<span class="str">'*'</span>]<br></div>
+<div style="margin-left: 40px;"><span class="kw">return self</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">where</span>(<span class="ac">self</span>, condition):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.where_conditions.append(condition)<br></div>
+<div style="margin-left: 40px;"><span class="kw">return self</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">join</span>(<span class="ac">self</span>, table, on_condition):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.joins.append({<span class="str">'table'</span>: table, <span class="str">'on'</span>: on_condition})<br></div>
+<div style="margin-left: 40px;"><span class="kw">return self</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">order_by</span>(<span class="ac">self</span>, column, direction=<span class="str">'ASC'</span>):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.order_by_col = {<span class="str">'col'</span>: column, <span class="str">'dir'</span>: direction}<br></div>
+<div style="margin-left: 40px;"><span class="kw">return self</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">limit</span>(<span class="ac">self</span>, n):<br></div>
+<div style="margin-left: 40px;"><span class="ac">self</span>.limit_val = n<br></div>
+<div style="margin-left: 40px;"><span class="kw">return self</span><br></div>
+<br>
+<div style="margin-left: 20px;"><span class="fn">build</span>(<span class="ac">self</span>):<br></div>
+<div style="margin-left: 40px;">query = <span class="str">f'SELECT {", ".join(self.select_cols)} FROM {self.table}'</span><br></div>
+<br>
+<div style="margin-left: 40px;"><span class="kw">for</span> join <span class="kw">in</span> <span class="ac">self</span>.joins:<br></div>
+<div style="margin-left: 60px;">query += <span class="str">f' JOIN {join["table"]} ON {join["on"]}'</span><br></div>
+<br>
+<div style="margin-left: 40px;"><span class="kw">if</span> <span class="ac">self</span>.where_conditions:<br></div>
+<div style="margin-left: 60px;">query += <span class="str">' WHERE '</span> + <span class="str">' AND '</span>.<span class="fn">join</span>(<span class="ac">self</span>.where_conditions)<br></div>
+<br>
+<div style="margin-left: 40px;"><span class="kw">if</span> <span class="ac">self</span>.order_by_col:<br></div>
+<div style="margin-left: 60px;">query += <span class="str">f' ORDER BY {self.order_by_col["col"]} {self.order_by_col["dir"]}'</span><br></div>
+<br>
+<div style="margin-left: 40px;"><span class="kw">if</span> <span class="ac">self</span>.limit_val:<br></div>
+<div style="margin-left: 60px;">query += <span class="str">f' LIMIT {self.limit_val}'</span><br></div>
+<br>
+<div style="margin-left: 40px;"><span class="kw">return</span> query<br></div>
+<br>
+}<br><br>
+<span class="cm"># Uso</span><br>
+query = <span class="tp">QueryBuilder</span>(<span class="str">'users'</span>)<br>
+<div style="margin-left: 20px;">.<span class="fn">select</span>(<span class="str">'id'</span>, <span class="str">'name'</span>, <span class="str">'email'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">join</span>(<span class="str">'orders'</span>, <span class="str">'users.id = orders.user_id'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">where</span>(<span class="str">'age > 18'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">where</span>(<span class="str">'status = "active"'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">order_by</span>(<span class="str">'created_at'</span>, <span class="str">'DESC'</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">limit</span>(<span class="num">10</span>)<br></div>
+<div style="margin-left: 20px;">.<span class="fn">build</span>()<br></div>
+      </div>
     </div>
   </section>
 
@@ -1365,7 +1523,7 @@ builder.reset();</span></div>
 
   <section>
     <div class="reveal">
-      <div class="section-label">Capítulo 10</div>
+      <div class="section-label">Capítulo 12</div>
       <h2>Prós e Contras</h2>
     </div>
 
@@ -1420,7 +1578,7 @@ builder.reset();</span></div>
 
   <section>
     <div class="reveal">
-      <div class="section-label">Capítulo 11</div>
+      <div class="section-label">Capítulo 13</div>
       <h2>Relação com<br>Outros Padrões</h2>
     </div>
 
